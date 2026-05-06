@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TERMINAL: AI-Ops Cognitive System</title>
+    <style>
+        /* =========================================
+           核心風格定義 (WH40K x DOOM x Cyberpunk Fusion)
+           ========================================= */
+        
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Share+Tech+Mono&display=swap');
+
+        :root {
+            /* DOOM 紅 & 螢光橘 */
+            --doom-red: #ff0000;
+            --doom-amber: #ff9900;
+            --doom-neon-blue: #00ffff;
+            /* WH40K 机械教紅 & 陰暗金屬 */
+            --wh40k-mechanicus: #8b0000;
+            --wh40k-gold: #c5a059;
+            --wh40k-parchment: #d2b48c;
+            /* 背景與基底 */
+            --bg-dark: #050505;
+            --panel-bg: rgba(20, 20, 20, 0.9);
+            --text-main: #e0e0e0;
+            --nav-height: 70px;
+        }
+
+        /* 平滑滾動設定 */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Share Tech Mono', monospace; 
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            background-image: 
+                linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)),
+                url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgdmlld0JveD0iMCAwIDQwIDQwIj48ZyBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiMyNjI2MjYiIGZpbGwtb3BhY2l0eT0iMC40Ij48cGF0aCBkPSJMGDAgaDg djNDA djQwIGg0MCB2LTQwSDAgeiBtMjAgMjBoMjB2MjBIMjB6TTAgMGgyMHYyMEgwMXoiLz48L2c+PC9nPjwvc3ZnPg=='); 
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            /* 為 Navigation Bar 留出頂部空間 */
+            padding-top: calc(var(--nav-height) + 20px);
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* 螢幕掃描線效果 (DOOM UI) */
+        body::before {
+            content: " ";
+            position: fixed;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
+            background-size: 100% 4px;
+            z-index: 1000;
+            pointer-events: none;
+            opacity: 0.3;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            border-left: 5px solid var(--wh40k-mechanicus);
+            border-right: 5px solid var(--wh40k-mechanicus);
+            box-shadow: 0 0 30px rgba(139, 0, 0, 0.5);
+            background: rgba(5,5,5,0.4);
+        }
+
+        /* =========================================
+           TOP NAVIGATION BAR (Cyberpunk OS)
+           ========================================= */
+        .navbar {
+            position: fixed;
+            top: 0; left: 0; width: 100%;
+            height: var(--nav-height);
+            background: rgba(10, 10, 12, 0.95);
+            border-bottom: 2px solid var(--doom-red);
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.4);
+            z-index: 9999;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 30px;
+            backdrop-filter: blur(8px);
+            box-sizing: border-box;
+        }
+
+        .navbar::after {
+            content: "CLASSIFIED // LEVEL 5 ACCESS";
+            position: absolute;
+            bottom: -15px; left: 30px;
+            font-size: 0.6em;
+            color: var(--doom-red);
+            letter-spacing: 2px;
+            animation: pulse 2s infinite;
+        }
+
+        .nav-logo {
+            font-family: 'Cinzel', serif;
+            color: var(--wh40k-gold);
+            font-size: 1.8em;
+            font-weight: bold;
+            text-decoration: none;
+            letter-spacing: 3px;
+            text-shadow: 0 0 10px rgba(197, 160, 89, 0.5);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 15px;
+        }
+
+        .nav-links a {
+            color: var(--text-main);
+            text-decoration: none;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.95em;
+            text-transform: uppercase;
+            padding: 8px 15px;
+            border: 1px solid transparent;
+            transition: 0.3s;
+            position: relative;
+        }
+
+        .nav-links a::before {
+            content: '>';
+            color: var(--doom-red);
+            margin-right: 5px;
+            opacity: 0;
+            transition: 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--wh40k-gold);
+            border-color: var(--doom-red);
+            background: rgba(255, 0, 0, 0.1);
+            box-shadow: inset 0 0 10px rgba(255, 0, 0, 0.2);
+        }
+
+        .nav-links a:hover::before {
+            opacity: 1;
+        }
+
+        /* Hamburger Menu */
+        .hamburger {
+            display: none;
+            color: var(--doom-red);
+            font-size: 2em;
+            cursor: pointer;
+            text-shadow: 0 0 10px var(--doom-red);
+        }
+
+        /* 錨點滾動位置修正 */
+        .scroll-target {
+            scroll-margin-top: calc(var(--nav-height) + 30px);
+        }
+
+        /* =========================================
+           標題與 UI 元素
+           ========================================= */
+
+        h1 {
+            font-family: 'Cinzel', serif;
+            color: var(--doom-red);
+            text-align: center;
+            text-transform: uppercase;
+            font-size: 2.8em;
+            letter-spacing: 3px;
+            text-shadow: 0 0 15px var(--doom-red);
+            border-bottom: 3px double var(--wh40k-gold);
+            padding-bottom: 20px;
+            margin-bottom: 40px;
+        }
+
+        h1::before {
+            content: "== AUTHORIZED PERSONNEL ONLY ==";
+            display: block;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.3em;
+            color: var(--wh40k-gold);
+            letter-spacing: 5px;
+            margin-bottom: 10px;
+        }
+
+        h2 {
+            font-family: 'Cinzel', serif;
+            color: var(--wh40k-gold);
+            background: linear-gradient(90deg, var(--wh40k-mechanicus) 0%, rgba(0,0,0,0) 100%);
+            padding: 10px 15px;
+            border-left: 5px solid var(--doom-red);
+            margin-top: 40px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        /* =========================================
+           區塊與卡片
+           ========================================= */
+
+        .section {
+            background-color: var(--panel-bg);
+            border: 2px solid #333;
+            padding: 30px;
+            margin-bottom: 30px;
+            position: relative;
+            clip-path: polygon(0 0, 95% 0, 100% 5%, 100% 100%, 5% 100%, 0 95%);
+            box-shadow: inset 0 0 15px rgba(255, 0, 0, 0.1);
+        }
+
+        .section:hover {
+            border-color: var(--doom-red);
+            box-shadow: inset 0 0 20px rgba(255, 0, 0, 0.2), 0 0 15px rgba(255, 0, 0, 0.3);
+            transition: 0.3s;
+        }
+
+        .concept-tag {
+            background-color: var(--wh40k-parchment);
+            color: #3121ecef;
+            font-family: 'Cinzel', serif;
+            font-weight: bold;
+            padding: 8px 15px;
+            text-transform: uppercase;
+            font-size: 0.9em;
+            display: inline-block;
+            margin-bottom: 15px;
+            box-shadow: 3px 3px 0px rgba(0,0,0,0.5);
+            border: 1px solid #8b7355;
+            position: relative;
+        }
+        
+        .concept-tag::after {
+            content: " [SIGIL.01]";
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.8em;
+            opacity: 0.7;
+        }
+
+        /* =========================================
+           特殊文字與列表
+           ========================================= */
+
+        strong { color: var(--doom-red); font-weight: bold; text-shadow: 0 0 5px rgba(255, 0, 0, 0.5); }
+        code { background-color: rgba(0, 255, 255, 0.1); color: var(--doom-neon-blue); padding: 2px 6px; border: 1px solid rgba(0, 255, 255, 0.3); font-size: 0.95em; }
+        
+        ul, ol { padding-left: 25px; list-style-type: none; }
+        ul li::before { content: "▷ "; color: var(--doom-red); margin-left: -20px; }
+        ol { counter-reset: step-counter; }
+        ol li { counter-increment: step-counter; margin-bottom: 10px; }
+        ol li::before { content: counter(step-counter) "."; color: var(--doom-amber); font-weight: bold; margin-left: -25px; margin-right: 10px; font-family: 'Cinzel', serif; }
+
+        .highlight { color: #fff; background-color: var(--wh40k-mechanicus); padding: 2px 5px; text-transform: uppercase; font-size: 0.9em; letter-spacing: 1px; }
+
+        /* =========================================
+           數據流 (DOOM Terminal Look)
+           ========================================= */
+
+        .flow {
+            background-color: #000;
+            color: var(--doom-neon-blue);
+            padding: 20px;
+            border: 1px solid var(--doom-neon-blue);
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 1.1em;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
+        }
+
+        .flow::before {
+            content: "DATA STREAM // COGITATOR STATUS: ACTIVE";
+            display: block;
+            font-size: 0.7em;
+            color: rgba(0, 255, 255, 0.5);
+            margin-bottom: 10px;
+            border-bottom: 1px solid rgba(0, 255, 255, 0.3);
+        }
+
+        .flow-arrow {
+            color: var(--doom-red);
+            font-weight: bold;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse { 0% { opacity: 0.4; } 50% { opacity: 1; } 100% { opacity: 0.4; } }
+
+        /* Contact Links */
+        .contact-links li code { color: var(--wh40k-gold); background: rgba(197, 160, 89, 0.1); border-color: rgba(197, 160, 89, 0.3); }
+
+        /* Footer */
+        .footer-text {
+            text-align: center;
+            font-family: 'Cinzel', serif;
+            color: #555;
+            font-size: 0.9em;
+            margin-top: 50px;
+            letter-spacing: 2px;
+            padding-bottom: 20px;
+        }
+
+        /* =========================================
+           RESPONSIVE DESIGN & MOBILE MENU
+           ========================================= */
+        @media (max-width: 850px) {
+            .hamburger { display: block; }
+            .nav-links {
+                position: fixed;
+                top: var(--nav-height);
+                right: -100%; /* 隱藏在右側 */
+                width: 280px;
+                height: calc(100vh - var(--nav-height));
+                background: rgba(10, 10, 12, 0.98);
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 40px 30px;
+                border-left: 2px solid var(--doom-red);
+                box-shadow: -10px 0 30px rgba(0,0,0,0.8);
+                transition: right 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            }
+            .nav-links.active {
+                right: 0;
+            }
+            .nav-links a {
+                width: 100%;
+                font-size: 1.2em;
+                padding: 15px 10px;
+                border-bottom: 1px dashed rgba(255, 0, 0, 0.3);
+            }
+            .nav-links a:hover {
+                background: rgba(255, 0, 0, 0.15);
+            }
+            .container {
+                border-left: none;
+                border-right: none;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- TOP NAVIGATION BAR -->
+    <nav class="navbar">
+        <a href="#home" class="nav-logo">AI-OPS</a>
+        <div class="hamburger" onclick="toggleMenu()">☰</div>
+        <div class="nav-links" id="navLinks">
+            <a href="#home" onclick="toggleMenu()">HOME</a>
+            <a href="#architecture" onclick="toggleMenu()">ARCHITECTURE</a>
+            <a href="#modules" onclick="toggleMenu()">MODULES</a>
+            <a href="#roadmap" onclick="toggleMenu()">ROADMAP</a>
+            <a href="#about" onclick="toggleMenu()">ABOUT</a>
+            <a href="#contact" onclick="toggleMenu()">CONTACT</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- HOME SECTION -->
+        <div id="home" class="scroll-target">
+            <h1>AI-Ops Cognitive System</h1>
+            
+            <div class="section">
+                <div class="concept-tag">Project Vision [1, 2]</div>
+                <p>這不僅是一個 ChatBot，而是一套具備<strong>狀態管理、任務規劃、行為控制與記憶系統</strong>的 AI Middleware [2]。</p>
+                <p>LLM 在此系統中被視為<span class="highlight">「推理引擎」</span>與<span class="highlight">「認知模組」</span>的一部分，而非單純的聊天接口 [1]。</p>
+                <p style="border-left: 3px solid var(--doom-amber); padding-left: 15px; color: var(--doom-amber);">
+                    <strong>核心理念：</strong> State First, Prompt Second [3, 4] — 所有 AI 行為本質上都是「狀態轉換」(State Transformation)。
+                </p>
+            </div>
+        </div>
+
+        <!-- ARCHITECTURE SECTION -->
+        <div id="architecture" class="scroll-target">
+            <div class="section">
+                <h2>1. 核心架構 (Core Architecture)</h2>
+                <p>系統採用「以控制器為中心」(Controller-Centric) 且「基於狀態」(State-Based) 的架構：</p>
+                <div class="flow">
+                    [INPUT] 使用者輸入 <span class="flow-arrow">↓↓↓</span> <br>
+                    [PROC] 分析層 (意圖/情緒/風險) <span class="flow-arrow">↓↓↓</span> <br>
+                    [BUS] Global State Bus (狀態總線) <span class="flow-arrow">↓↓↓</span> <br>
+                    [CORE] State Controller (中央調度核心) <span class="flow-arrow">↓↓↓</span> <br>
+                    [COG] 認知模組 (規劃/記憶/推理) <span class="flow-arrow">↓↓↓</span> <br>
+                    [ACT] 行為規劃層 <span class="flow-arrow">↓↓↓</span> <br>
+                    [OUTPUT] 輸出生成 <span class="flow-arrow">↺↻</span> 反思引擎 (Reflection)
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>2. 全域狀態系統 (Global State System)</h2>
+                <p>這是系統的<span class="highlight">「唯一事實來源」</span>(Single Source of Truth)，所有模組共享此狀態：</p>
+                <ul style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 10px;">
+                    <li><strong>Emotion State:</strong> 平靜、壓力、過載、專注</li>
+                    <li><strong>Goal State:</strong> 學習、問題解決、決策、執行</li>
+                    <li><strong>System Mode:</strong> 助理、規劃者、導師、評論家</li>
+                    <li><strong>Risk & Focus:</strong> 風險等級與專注程度</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- MODULES SECTION -->
+        <div id="modules" class="scroll-target">
+            <div class="section">
+                <h2>3. 認知模組清單 (Cognitive Modules)</h2>
+                <p>Mechanicus Logis-calculi 認證模組：</p>
+                <ul>
+                    <li><strong>Intent Analyzer:</strong> 分析意圖、緊急度、複雜度。</li>
+                    <li><strong>Emotion Analyzer:</strong> 偵測情緒與壓力等級。</li>
+                    <li><strong>Task Planner:</strong> 拆解目標為里程碑與子任務。</li>
+                    <li><strong>Memory Manager:</strong> 管理短期、長期、情節與語意記憶。</li>
+                    <li><strong>Behavior Planner:</strong> 控制回應風格、語氣與複雜度。</li>
+                    <li><strong>Reflection Engine:</strong> 檢查邏輯衝突、偏題或幻覺風險。</li>
+                    <li><strong>Strategy Engine:</strong> 生成決策方案與風險分析。</li>
+                    <li><strong>Workflow Engine:</strong> 控制模組執行順序與工具路由。</li>
+                </ul>
+            </div>
+
+            <div class="section">
+                <h2>4. 運行生命週期 (Runtime Cycle)</h2>
+                <p>系統並非單次對話，而是持續的認知進程 (Continuous Cognitive Process)：</p>
+                <ol>
+                    <li><strong>IDLE:</strong> 等待輸入協定。</li>
+                    <li><strong>ANALYZE:</strong> 分析意圖、情緒、風險。</li>
+                    <li><strong>STATE_UPDATE:</strong> 更新使用者與任務狀態。</li>
+                    <li><strong>MODE_SELECTION:</strong> 決定運作模式與工作流。</li>
+                    <li><strong>EXECUTION:</strong> 執行規劃、推理與行為生成。</li>
+                    <li><strong>REFLECTION:</strong> 輸出前進行衝突檢查與神聖反思。</li>
+                    <li><strong>RESPONSE:</strong> 產生最終回應、計畫或建議。</li>
+                    <li><strong>MEMORY_UPDATE:</strong> 更新記憶聖殿並等待下一輪輸入。</li>
+                </ol>
+            </div>
+        </div>
+
+        <!-- ROADMAP SECTION -->
+        <div id="roadmap" class="scroll-target">
+            <div class="section" style="border: 2px solid var(--wh40k-gold); box-shadow: 0 0 20px rgba(197, 160, 89, 0.3);">
+                <h2 style="background: linear-gradient(90deg, #443518 0%, rgba(0,0,0,0) 100%); color: var(--wh40k-gold); border-left: 5px solid var(--wh40k-gold); margin-top: 10px;">5. 系統開發藍圖 (Strategic Roadmap)</h2>
+                <ul>
+                    <li><span style="color: var(--wh40k-gold);">Phase 1:</span> 核心運行環境 (FastAPI, Global State, Controller)</li>
+                    <li><span style="color: var(--wh40k-gold);">Phase 2:</span> 記憶系統 (長期記憶存取)</li>
+                    <li><span style="color: var(--wh40k-gold);">Phase 3:</span> 進階控制 (反思引擎, 策略引擎)</li>
+                    <li><span style="color: var(--doom-red); font-weight: bold; text-shadow: 0 0 5px red;">Phase 4/5:</span> 多 Agent 協作與完整 AI 作業系統</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- ABOUT SECTION -->
+        <div id="about" class="scroll-target">
+            <div class="section">
+                <h2>ABOUT // 系統檔案</h2>
+                <div class="concept-tag" style="background-color: var(--wh40k-mechanicus); color: #fff; border-color: var(--doom-red);">AI-OPS Cognitive System</div>
+                <p style="font-size: 1.2em; color: var(--doom-neon-blue); border-left: 3px solid var(--doom-neon-blue); padding-left: 10px;"><strong>Human-AI Workflow Architecture Prototype</strong></p>
+                <p>這是一套：</p>
+                <ul>
+                    <li><strong>State-Based AI:</strong> 狀態驅動的動態決策核心</li>
+                    <li><strong>AI Middleware:</strong> 介於人類語言與系統邏輯的智慧中介層</li>
+                    <li><strong>Cognitive Workflow:</strong> 自主運算與認知流動的神經網路</li>
+                    <li><strong>Human-AI Decision System:</strong> 降低摩擦、提升效率的人機協同操作系統</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- CONTACT SECTION -->
+        <div id="contact" class="scroll-target">
+            <div class="section">
+                <h2>CONTACT // 建立通訊協議</h2>
+                <p>ESTABLISH SECURE CONNECTION:</p>
+                <ul class="contact-links">
+                    <li><code>[EMAIL]</code> placeholder@ai-ops.dev</li>
+                    <li><code>[GITHUB]</code> github.com/placeholder-ai</li>
+                    <li><code>[DISCORD]</code> discord.gg/placeholder</li>
+                    <li><code>[NOTION]</code> notion.so/placeholder-workspace</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer-text">
+            Praised be the Omnissiah. Rip and Tear.
+        </div>
+    </div>
+
+    <!-- JavaScript for Mobile Menu -->
+    <script>
+        function toggleMenu() {
+            if (window.innerWidth <= 850) {
+                const navLinks = document.getElementById('navLinks');
+                navLinks.classList.toggle('active');
+            }
+        }
+    </script>
+</body>
+</html>
