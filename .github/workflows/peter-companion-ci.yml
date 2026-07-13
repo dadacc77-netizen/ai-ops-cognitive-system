@@ -1,0 +1,25 @@
+name: Peter Companion CI
+
+on:
+  pull_request:
+    paths:
+      - "peter-ai-companion/**"
+      - ".github/workflows/peter-companion-ci.yml"
+  push:
+    paths:
+      - "peter-ai-companion/**"
+      - ".github/workflows/peter-companion-ci.yml"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: peter-ai-companion
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Run contract and unit tests
+        run: python tools/run_all.py

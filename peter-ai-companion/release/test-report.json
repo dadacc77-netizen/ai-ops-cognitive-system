@@ -1,0 +1,10 @@
+{
+  "product": "Peter AI Companion｜雙模式語音陪跑",
+  "version": "1.0-rc1",
+  "status": "PASS",
+  "tests_run": 24,
+  "test_failures_or_errors": 0,
+  "contract_errors": [],
+  "python": "3.13.5",
+  "note": "Local verified run on 2026-07-13; GitHub Actions reruns independently on PR."
+}
